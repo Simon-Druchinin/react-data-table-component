@@ -135,6 +135,9 @@ export type TableColumnBase = {
 	style?: CSSObject;
 	width?: string;
 	wrap?: boolean;
+	freeze?: boolean | number | ((value: number) => CSSObject) | Media;
+	paddingLeft?: string;
+	paddingRight?: string
 };
 
 export interface TableColumn<T> extends TableColumnBase {
@@ -377,3 +380,9 @@ export type Action<T> =
 	| PaginationPageAction
 	| PaginationRowsPerPageAction
 	| ClearSelectedRowsAction;
+
+
+export type ColumnOffset = {
+	direction: 'left' | 'right'
+	value: number
+}

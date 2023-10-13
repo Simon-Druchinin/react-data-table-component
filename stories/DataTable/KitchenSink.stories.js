@@ -17,10 +17,31 @@ const subHeaderComponent = (
 
 const columns = [
 	{
-		name: 'Title',
+		name: 'Title Frozen',
 		selector: row => row.title,
 		sortable: true,
 		reorder: true,
+		freeze: true,
+	},
+	{
+		name: 'Director Frozen Md',
+		selector: row => row.director,
+		sortable: true,
+		reorder: true,
+		freeze: 'md'
+	},
+	{
+		name: 'Year Frozen Px',
+		selector: row => row.year,
+		sortable: true,
+		reorder: true,
+		freeze: 700
+	},
+	{
+		name: 'Title',
+		selector: row => row.title,
+		sortable: true,
+		reorder: true
 	},
 	{
 		name: 'Director',
@@ -31,6 +52,36 @@ const columns = [
 	{
 		name: 'Year',
 		selector: row => row.year,
+		sortable: true,
+		reorder: true,
+	},
+	{
+		name: 'Year 2',
+		selector: row => row.year,
+		sortable: true,
+		reorder: true,
+	},
+	{
+		name: 'Runtime',
+		selector: row => row.runtime,
+		sortable: true,
+		reorder: true,
+	},
+	{
+		name: 'Runtime',
+		selector: row => row.runtime,
+		sortable: true,
+		reorder: true,
+	},
+	{
+		name: 'Genres',
+		selector: row => row.genres.join(", "),
+		sortable: true,
+		reorder: true,
+	},
+	{
+		name: 'Actors',
+		selector: row => row.actors,
 		sortable: true,
 		reorder: true,
 	},

@@ -24,11 +24,13 @@ function useColumns<T>(
 	defaultSortFieldId: string | number | null | undefined,
 	defaultSortAsc: boolean,
 	frozenColumnsAlignment: Alignment.LEFT | Alignment.RIGHT | undefined,
-	tableDirection: Direction
+	tableDirection: Direction,
 ): ColumnsHook<T> {
-	const windowWidth = useWindowSize().width
+	const windowWidth = useWindowSize().width;
 
-	const [tableColumns, setTableColumns] = React.useState<TableColumnExtended<T>[]>(() => decorateColumns(columns, tableDirection == Direction.RTL, windowWidth, frozenColumnsAlignment));
+	const [tableColumns, setTableColumns] = React.useState<TableColumnExtended<T>[]>(() =>
+		decorateColumns(columns, tableDirection == Direction.RTL, windowWidth, frozenColumnsAlignment),
+	);
 	const [draggingColumnId, setDraggingColumn] = React.useState('');
 	const sourceColumnId = React.useRef('');
 
@@ -60,8 +62,11 @@ function useColumns<T>(
 				const targetColIndex = findColumnIndexById(tableColumns, id);
 				const reorderedCols = [...tableColumns];
 
-				if (frozenColumnsAlignment && ((tableColumns[targetColIndex].$isFrozen && !tableColumns[selectedColIndex].$isFrozen) ||
-					(!tableColumns[targetColIndex].$isFrozen && tableColumns[selectedColIndex].$isFrozen))) {
+				if (
+					frozenColumnsAlignment &&
+					((tableColumns[targetColIndex].$isFrozen && !tableColumns[selectedColIndex].$isFrozen) ||
+						(!tableColumns[targetColIndex].$isFrozen && tableColumns[selectedColIndex].$isFrozen))
+				) {
 					e.preventDefault();
 					return;
 				}
@@ -100,10 +105,10 @@ function useColumns<T>(
 	);
 
 	const setColumnOffset = (offset: ColumnOffset, id: string | undefined) => {
-		const offsetColumns = [...tableColumns]
-		offsetColumns[findColumnIndexById(tableColumns, id)].$offset = offset
-		setTableColumns(offsetColumns)
-	}
+		const offsetColumns = [...tableColumns];
+		offsetColumns[findColumnIndexById(tableColumns, id)].$offset = offset;
+		setTableColumns(offsetColumns);
+	};
 
 	return {
 		tableColumns,

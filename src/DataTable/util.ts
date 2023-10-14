@@ -1,5 +1,7 @@
 import { CSSObject } from 'styled-components';
-import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction } from './types';
+import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, TableColumnExtended } from './types';
+import { LARGE, MEDIUM, SMALL } from './media';
+import { Alignment } from './constants';
 
 export function prop<T, K extends keyof T>(obj: T, key: K): T[K] {
 	return obj[key];
@@ -29,7 +31,7 @@ export function sort<T>(
 		return sortFn(rows.slice(0), selector as Selector<T>, direction);
 	}
 
-	return rows.slice(0).sort((a: T, b: T) => {
+	return rows.slice(0).sort((a: any, b: any) => {
 		let aValue;
 		let bValue;
 
@@ -83,7 +85,7 @@ export function parseSelector<T extends Record<string, any>>(row: T, selector: s
 }
 
 export function getProperty<T>(
-	row: T,
+	row: any,
 	// TODO: remove string type in V8
 	selector: Selector<T> | string | undefined | null | unknown, // unknown allows us to throw an error for JS code
 	format: Format<T> | undefined | null,
@@ -139,10 +141,24 @@ export function removeItem<T>(array: T[] = [], item: T, keyField = 'id'): T[] {
 }
 
 // Make sure columns have unique id's
-export function decorateColumns<T>(columns: TableColumn<T>[]): TableColumn<T>[] {
-	return columns.map((column, index) => {
-		const decoratedColumn: TableColumn<T> = {
+export function decorateColumns<T>(
+	columns: TableColumn<T>[],
+	isRTL: boolean,
+	windowWidth?: number,
+	frozenColumnsAlignment?: Alignment.LEFT | Alignment.RIGHT,
+): TableColumnExtended<T>[] {
+	return (
+		frozenColumnsAlignment && windowWidth ?
+			alignFrozenColumns(columns, windowWidth, frozenColumnsAlignment, isRTL) :
+			columns
+	).map((column, index) => {
+		const decoratedColumn: TableColumnExtended<T> = {
 			...column,
+			$isFrozen: windowWidth !== undefined && isColumnFrozen(column, windowWidth),
+			$offset: {
+				direction: frozenColumnsAlignment === Alignment.LEFT ? 'left' : 'right',
+				value: 0
+			},
 			sortable: column.sortable || !!column.sortFunction || undefined,
 		};
 
@@ -154,6 +170,39 @@ export function decorateColumns<T>(columns: TableColumn<T>[]): TableColumn<T>[] 
 
 		return decoratedColumn;
 	});
+}
+
+export function alignFrozenColumns<T>(
+	columns: TableColumn<T>[],
+	windowWidth: number,
+	alignment: Alignment.LEFT | Alignment.RIGHT,
+	isRTL: boolean
+): TableColumn<T>[] {
+	const frozenColumns: TableColumn<T>[] = []
+	const normalColumns: TableColumn<T>[] = []
+
+	columns.forEach(col => {
+		if (isColumnFrozen(col, windowWidth)) {
+			frozenColumns.push(col)
+		} else {
+			normalColumns.push(col)
+		}
+	})
+
+	let shouldLeftAlign = alignment === Alignment.LEFT;
+	if (isRTL) shouldLeftAlign = !shouldLeftAlign;
+
+	return shouldLeftAlign ? [...frozenColumns, ...normalColumns] : [...normalColumns, ...frozenColumns]
+}
+
+export function isColumnFrozen<T>(column: TableColumn<T>, windowWidth: number): boolean {
+	return column.freeze !== undefined && (
+		column.freeze === true ||
+		(column.freeze === 'sm' && windowWidth > SMALL) ||
+		(column.freeze === 'md' && windowWidth > MEDIUM) ||
+		(column.freeze === 'lg' && windowWidth > LARGE) ||
+		(Number.isInteger(column.freeze) && windowWidth > (column.freeze as number))
+	)
 }
 
 export function getSortDirection(ascDirection: boolean | undefined = false): SortOrder {

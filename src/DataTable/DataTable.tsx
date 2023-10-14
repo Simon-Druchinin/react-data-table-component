@@ -32,6 +32,7 @@ import {
 	SortOrder,
 } from './types';
 import useColumns from '../hooks/useColumns';
+import { Alignment, Direction } from './constants';
 
 function DataTable<T>(props: TableProps<T>): JSX.Element {
 	const {
@@ -116,6 +117,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		direction = defaultProps.direction,
 		onColumnOrderChange = defaultProps.onColumnOrderChange,
 		className,
+		frozenColumnsAlignment
 	} = props;
 
 	const {
@@ -126,9 +128,10 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		handleDragOver,
 		handleDragLeave,
 		handleDragEnd,
+		setColumnOffset,
 		defaultSortDirection,
 		defaultSortColumn,
-	} = useColumns(columns, onColumnOrderChange, defaultSortFieldId, defaultSortAsc);
+	} = useColumns(columns, onColumnOrderChange, defaultSortFieldId, defaultSortAsc, frozenColumnsAlignment, direction);
 
 	const [
 		{
@@ -336,6 +339,44 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 	const visibleRows = selectableRowsVisibleOnly ? tableRows : sortedData;
 	const showSelectAll = persistSelectedOnPageChange || selectableRowsSingle || selectableRowsNoSelectAll;
+
+	// Calc offsets for frozen columns
+	const [skipUpdate, setSkipUpdate] = React.useState(false)
+	const [lastFrozenColId, setLastFrozenColId] = React.useState('')
+
+	React.useEffect(() => {
+		if (skipUpdate) {
+			setSkipUpdate(false)
+			return
+		}
+
+		let totalWidth = 0;
+		let frozenColumns: HTMLDivElement[] = Array.from(document.querySelectorAll('.rdt_TableCol_frozen'));
+		const isDirectionRTL = direction === Direction.RTL;
+		const isAlignmentLeft = frozenColumnsAlignment === Alignment.LEFT || frozenColumnsAlignment === undefined;
+		frozenColumns = ((isDirectionRTL && !isAlignmentLeft) || (!isDirectionRTL && isAlignmentLeft)) ? frozenColumns : frozenColumns.reverse();
+
+		frozenColumns.forEach(elem => {
+			const { attributes, offsetWidth } = elem as HTMLDivElement;
+			const id = attributes.getNamedItem('data-column-id')?.value;
+
+			console.log(totalWidth)
+
+			setSkipUpdate(true)
+			setColumnOffset({
+				direction: isAlignmentLeft ? 'left' : 'right',
+				value: totalWidth
+			}, id)
+
+			totalWidth += offsetWidth
+		})
+
+		if (frozenColumnsAlignment !== undefined) {
+			const { attributes } = frozenColumns[frozenColumns.length - 1] as HTMLDivElement;
+			const id = attributes.getNamedItem('data-column-id')?.value;
+			setLastFrozenColId(id || '');
+		}
+	}, [tableColumns]);
 
 	return (
 		<ThemeProvider theme={currentTheme}>

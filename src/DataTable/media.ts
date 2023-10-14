@@ -22,9 +22,32 @@ export const media = {
 	`,
 	custom:
 		(value: number) =>
-		(literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation =>
-			css`
+			(literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation =>
+				css`
 				@media screen and (max-width: ${value}px) {
+					${css(literals, ...args)}
+				}
+			`,
+	min_sm: (literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation => css`
+		@media screen and (min-width: ${SMALL}px) {
+			${css(literals, ...args)}
+		}
+	`,
+	min_md: (literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation => css`
+		@media screen and (min-width: ${MEDIUM}px) {
+			${css(literals, ...args)}
+		}
+	`,
+	min_lg: (literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation => css`
+		@media screen and (min-width: ${LARGE}px) {
+			${css(literals, ...args)}
+		}
+	`,
+	min_custom:
+		(value: number) =>
+			(literals: TemplateStringsArray, ...args: CSSObject[]): FlattenSimpleInterpolation =>
+				css`
+				@media screen and (min-width: ${value}px) {
 					${css(literals, ...args)}
 				}
 			`,

@@ -2,9 +2,7 @@ import * as React from 'react';
 import styled, { css, CSSObject } from 'styled-components';
 import { CellExtended } from './Cell';
 import { getProperty, getConditionalStyle } from './util';
-import { ColumnOffset, TableColumn, TableColumnExtended } from './types';
-import useRTL from '../hooks/useRTL';
-import { Direction } from './constants';
+import { TableColumnExtended } from './types';
 
 interface CellStyleProps {
 	$renderAsCell: boolean | undefined;

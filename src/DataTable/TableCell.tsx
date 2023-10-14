@@ -2,7 +2,9 @@ import * as React from 'react';
 import styled, { css, CSSObject } from 'styled-components';
 import { CellExtended } from './Cell';
 import { getProperty, getConditionalStyle } from './util';
-import { TableColumn } from './types';
+import { ColumnOffset, TableColumn, TableColumnExtended } from './types';
+import useRTL from '../hooks/useRTL';
+import { Direction } from './constants';
 
 interface CellStyleProps {
 	$renderAsCell: boolean | undefined;
@@ -31,7 +33,7 @@ const CellStyle = styled(CellExtended).attrs(props => ({
 interface CellProps<T> {
 	id: string;
 	dataTag: string | null;
-	column: TableColumn<T>;
+	column: TableColumnExtended<T>;
 	row: T;
 	rowIndex: number;
 	isDragging: boolean;
@@ -55,12 +57,13 @@ function Cell<T>({
 	onDragEnter,
 	onDragLeave,
 }: CellProps<T>): JSX.Element {
-	const { style, classNames } = getConditionalStyle(row, column.conditionalCellStyles, ['rdt_TableCell']);
+	const { style, classNames } = getConditionalStyle(row, column.conditionalCellStyles, ['rdt_TableCell', column.$isFrozen ? 'rdt_TableCell_frozen' : '']);
 
 	return (
 		<CellStyle
 			id={id}
 			data-column-id={column.id}
+			offset={column.$offset}
 			role="cell"
 			className={classNames}
 			data-tag={dataTag}
@@ -72,10 +75,13 @@ function Cell<T>({
 			compact={column.compact}
 			grow={column.grow}
 			hide={column.hide}
+			freeze={column.freeze}
 			maxWidth={column.maxWidth}
 			minWidth={column.minWidth}
 			right={column.right}
 			width={column.width}
+			paddingLeft={column.paddingLeft}
+			paddingRight={column.paddingRight}
 			$wrapCell={column.wrap}
 			style={style}
 			$isDragging={isDragging}

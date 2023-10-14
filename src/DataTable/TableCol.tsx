@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { CellExtended, CellProps } from './Cell';
 import NativeSortIcon from '../icons/NativeSortIcon';
 import { equalizeId } from './util';
-import { TableColumn, SortAction, SortOrder } from './types';
+import { TableColumn, SortAction, SortOrder, TableColumnExtended } from './types';
 
 interface ColumnStyleProps extends CellProps {
 	$isDragging?: boolean;
@@ -81,7 +81,7 @@ const ColumnText = styled.div`
 `;
 
 type TableColProps<T> = {
-	column: TableColumn<T>;
+	column: TableColumnExtended<T>;
 	disabled: boolean;
 	draggingColumnId?: string | number;
 	sortIcon?: React.ReactNode;
@@ -184,16 +184,20 @@ function TableCol<T>({
 
 	return (
 		<ColumnStyled
+			offset={column.$offset}
 			data-column-id={column.id}
-			className="rdt_TableCol"
+			className={"rdt_TableCol" + (column.$isFrozen ? " rdt_TableCol_frozen" : "")}
 			$headCell
 			allowOverflow={column.allowOverflow}
 			button={column.button}
 			compact={column.compact}
 			grow={column.grow}
 			hide={column.hide}
+			freeze={column.freeze}
 			maxWidth={column.maxWidth}
 			minWidth={column.minWidth}
+			paddingLeft={column.paddingLeft}
+			paddingRight={column.paddingRight}
 			right={column.right}
 			center={column.center}
 			width={column.width}

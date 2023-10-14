@@ -116,6 +116,7 @@ const KitchenSinkStory = ({
 	subHeaderWrap,
 	responsive,
 	disabled,
+	frozenColumnsAllignment,
 }) => {
 	const selectableRowsComponentProps = React.useMemo(
 		() => ({
@@ -159,6 +160,7 @@ const KitchenSinkStory = ({
 			direction={direction}
 			responsive={responsive}
 			disabled={disabled}
+			frozenColumnsAlignment={frozenColumnsAllignment}
 		/>
 	);
 };
@@ -170,6 +172,7 @@ export const KitchenSink = Template.bind({});
 // KitchenSink.parameters = { controls: { include: ['foo', 'bar'] } };
 
 KitchenSink.args = {
+	frozenColumnsAllignment: Alignment.LEFT,
 	selectableRows: false,
 	selectableRowsNoSelectAll: false,
 	selectableRowsVisibleOnly: false,
@@ -255,6 +258,10 @@ export default {
 			table: {
 				category: 'Expandable Rows',
 			},
+		},
+		frozenColumnsAllignment: {
+			options: [Alignment.RIGHT, Alignment.LEFT, undefined],
+			control: { type: 'select' },
 		},
 		subHeaderAlign: {
 			options: [Alignment.RIGHT, Alignment.CENTER, Alignment.LEFT],

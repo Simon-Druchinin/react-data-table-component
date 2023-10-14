@@ -32,7 +32,7 @@ export type TableProps<T> = {
 	actions?: React.ReactNode | React.ReactNode[];
 	className?: string;
 	clearSelectedRows?: boolean;
-	columns: TableColumn<T>[];
+	columns: TableColumnExtended<T>[];
 	conditionalRowStyles?: ConditionalStyles<T>[];
 	contextActions?: React.ReactNode | React.ReactNode[];
 	contextComponent?: React.ReactNode;
@@ -114,6 +114,7 @@ export type TableProps<T> = {
 	 *  Shows and displays a header with a title
 	 *  */
 	title?: string | React.ReactNode;
+	frozenColumnsAlignment?: Alignment.LEFT | Alignment.RIGHT;
 };
 
 export type TableColumnBase = {
@@ -137,7 +138,7 @@ export type TableColumnBase = {
 	wrap?: boolean;
 	freeze?: boolean | number | ((value: number) => CSSObject) | Media;
 	paddingLeft?: string;
-	paddingRight?: string
+	paddingRight?: string;
 };
 
 export interface TableColumn<T> extends TableColumnBase {
@@ -148,6 +149,12 @@ export interface TableColumn<T> extends TableColumnBase {
 	format?: Format<T> | undefined;
 	selector?: Selector<T>;
 	sortFunction?: ColumnSortFunction<T>;
+}
+
+// Internal properties (not exposed to the user)
+export interface TableColumnExtended<T> extends TableColumn<T> {
+	$isFrozen: boolean;
+	$offset: ColumnOffset;
 }
 
 export interface ConditionalStyles<T> {

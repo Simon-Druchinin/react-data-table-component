@@ -187,8 +187,6 @@ function TableCol<T>({
 			freeze={column.freeze}
 			maxWidth={column.maxWidth}
 			minWidth={column.minWidth}
-			paddingLeft={column.paddingLeft}
-			paddingRight={column.paddingRight}
 			right={column.right}
 			center={column.center}
 			width={column.width}

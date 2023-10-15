@@ -25,8 +25,8 @@ function useColumns<T>(
 	defaultSortAsc: boolean,
 	frozenColumnsAlignment: Alignment.LEFT | Alignment.RIGHT | undefined,
 	tableDirection: Direction,
+	windowWidth: number = 0
 ): ColumnsHook<T> {
-	const windowWidth = useWindowSize().width;
 
 	const [tableColumns, setTableColumns] = React.useState<TableColumnExtended<T>[]>(() =>
 		decorateColumns(columns, tableDirection == Direction.RTL, windowWidth, frozenColumnsAlignment),

@@ -32,6 +32,7 @@ import {
 	SortOrder,
 } from './types';
 import useColumns from '../hooks/useColumns';
+import useWindowSize from '../hooks/useWindowSize';
 import { Alignment, Direction } from './constants';
 
 function DataTable<T>(props: TableProps<T>): JSX.Element {
@@ -120,6 +121,8 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		frozenColumnsAlignment
 	} = props;
 
+	const windowSize = useWindowSize();
+
 	const {
 		tableColumns,
 		draggingColumnId,
@@ -131,7 +134,15 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		setColumnOffset,
 		defaultSortDirection,
 		defaultSortColumn,
-	} = useColumns(columns, onColumnOrderChange, defaultSortFieldId, defaultSortAsc, frozenColumnsAlignment, direction);
+	} = useColumns(
+		columns,
+		onColumnOrderChange,
+		defaultSortFieldId,
+		defaultSortAsc,
+		frozenColumnsAlignment,
+		direction,
+		windowSize.width
+	);
 
 	const [
 		{

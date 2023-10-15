@@ -144,19 +144,19 @@ export function removeItem<T>(array: T[] = [], item: T, keyField = 'id'): T[] {
 export function decorateColumns<T>(
 	columns: TableColumn<T>[],
 	isRTL: boolean,
-	windowWidth?: number,
-	frozenColumnsAlignment?: Alignment.LEFT | Alignment.RIGHT,
+	windowWidth: number,
+	frozenColumnsAlignment: Alignment.LEFT | Alignment.RIGHT | undefined,
 ): TableColumnExtended<T>[] {
 	return (
-		frozenColumnsAlignment && windowWidth ?
+		frozenColumnsAlignment ?
 			alignFrozenColumns(columns, windowWidth, frozenColumnsAlignment, isRTL) :
 			columns
 	).map((column, index) => {
 		const decoratedColumn: TableColumnExtended<T> = {
 			...column,
-			$isFrozen: windowWidth !== undefined && isColumnFrozen(column, windowWidth),
+			$isFrozen: isColumnFrozen(column, windowWidth),
 			$offset: {
-				direction: frozenColumnsAlignment === Alignment.LEFT ? 'left' : 'right',
+				direction: frozenColumnsAlignment || 'left',
 				value: 0
 			},
 			sortable: column.sortable || !!column.sortFunction || undefined,

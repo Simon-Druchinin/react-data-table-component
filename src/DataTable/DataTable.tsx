@@ -358,9 +358,6 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 	const calculateOffsets = () => {
 		if (skipUpdate) {
 			setSkipUpdate(false)
-		}
-
-		if (skipUpdate || progressPending) {
 			return
 		}
 
@@ -394,7 +391,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 	React.useEffect(() => {
 		calculateOffsets();
-	}, [tableColumns, currentPage, rowsPerPage, selectedColumn, sortDirection]);
+	}, [tableColumns, currentPage, sortedData]);
 
 	return (
 		<ThemeProvider theme={currentTheme}>

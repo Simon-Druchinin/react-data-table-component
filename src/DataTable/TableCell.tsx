@@ -55,7 +55,7 @@ function Cell<T>({
 	onDragEnter,
 	onDragLeave,
 }: CellProps<T>): JSX.Element {
-	const { style, classNames } = getConditionalStyle(row, column.conditionalCellStyles, ['rdt_TableCell', column.$isFrozen ? 'rdt_TableCell_frozen' : '']);
+	const { style, classNames } = getConditionalStyle(row, column.conditionalCellStyles, ['rdt_TableCell']);
 
 	return (
 		<CellStyle

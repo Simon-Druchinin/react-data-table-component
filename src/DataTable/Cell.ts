@@ -42,8 +42,8 @@ export const CellExtended = styled(CellBase)<CellPropsExtended>`
 	${({ compact, button }) => (compact || button) && 'padding: 0'};
 
 	/* handle left and right padding */
-	padding-left: ${({ paddingLeft }) => paddingLeft || 'unset'};
-	padding-right: ${({ paddingRight }) => paddingRight || 'unset'};
+	${({ paddingLeft }) => paddingLeft && `padding-left: ${paddingLeft} !important`};
+	${({ paddingRight }) => paddingRight && `padding-right: ${paddingRight} !important`};
 
 	/* handle freezing cells */
 	${({ freeze, offset }) =>

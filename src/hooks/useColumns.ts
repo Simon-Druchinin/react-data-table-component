@@ -2,7 +2,6 @@ import * as React from 'react';
 import { decorateColumns, findColumnIndexById, getSortDirection } from '../DataTable/util';
 import useDidUpdateEffect from '../hooks/useDidUpdateEffect';
 import { ColumnOffset, SortOrder, TableColumn, TableColumnExtended } from '../DataTable/types';
-import useWindowSize from './useWindowSize';
 import { Alignment, Direction } from '../DataTable/constants';
 
 type ColumnsHook<T> = {

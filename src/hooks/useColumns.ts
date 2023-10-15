@@ -38,7 +38,11 @@ function useColumns<T>(
 	const [draggingColumnId, setDraggingColumn] = React.useState('');
 	const sourceColumnId = React.useRef('');
 
-
+	useDidUpdateEffect(() => {
+		setTableColumns(
+			alignFrozenColumns(decorateColumns(columns, windowWidth), shouldLeftAlign)
+		);
+	}, [columns, shouldLeftAlign]);
 
 	useDidUpdateEffect(() => {
 		const offsets: {
@@ -52,7 +56,7 @@ function useColumns<T>(
 		setTableColumns(
 			alignFrozenColumns(decorateColumns(columns, windowWidth, offsets), shouldLeftAlign)
 		);
-	}, [columns, windowWidth, shouldLeftAlign]);
+	}, [windowWidth]);
 
 	const handleDragStart = React.useCallback(
 		(e: React.DragEvent<HTMLDivElement>) => {

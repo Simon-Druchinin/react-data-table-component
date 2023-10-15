@@ -346,6 +346,9 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 	React.useEffect(() => {
 		if (skipUpdate) {
 			setSkipUpdate(false)
+		}
+
+		if (skipUpdate || progressPending) {
 			return
 		}
 
@@ -367,7 +370,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 			totalWidth += offsetWidth;
 		})
-	}, [tableColumns, currentPage, sortDirection, selectedColumn ]);
+	}, [tableColumns, currentPage, sortDirection, selectedColumn, progressPending ]);
 
 	return (
 		<ThemeProvider theme={currentTheme}>

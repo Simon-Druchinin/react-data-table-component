@@ -18,7 +18,7 @@ import { CellBase } from './Cell';
 import NoData from './NoDataWrapper';
 import NativePagination from './Pagination';
 import useDidUpdateEffect from '../hooks/useDidUpdateEffect';
-import { prop, getNumberOfPages, sort, isEmpty, isRowSelected, recalculatePage } from './util';
+import { prop, getNumberOfPages, sort, isEmpty, isRowSelected, recalculatePage, findColumnIndexById } from './util';
 import { defaultProps } from './defaultProps';
 import { createStyles } from './styles';
 import {
@@ -30,6 +30,7 @@ import {
 	TableProps,
 	TableState,
 	SortOrder,
+	ColumnOffset,
 } from './types';
 import useColumns from '../hooks/useColumns';
 import useWindowSize from '../hooks/useWindowSize';
@@ -121,6 +122,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		frozenColumnsAlignment
 	} = props;
 
+	// States used by frozen columns
 	const windowSize = useWindowSize();
 
 	const {
@@ -353,8 +355,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 	// Calc offsets for frozen columns
 	const [skipUpdate, setSkipUpdate] = React.useState(false)
-
-	React.useEffect(() => {
+	const calculateOffsets = () => {
 		if (skipUpdate) {
 			setSkipUpdate(false)
 		}
@@ -365,23 +366,35 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 		let totalWidth = 0;
 		let frozenColumns: HTMLDivElement[] = Array.from(document.querySelectorAll('.rdt_TableCol_frozen'));
-		const isDirectionRTL = direction === Direction.RTL;
-		const isAlignmentLeft = frozenColumnsAlignment === Alignment.LEFT || frozenColumnsAlignment === undefined;
-		frozenColumns = ((isDirectionRTL && !isAlignmentLeft) || (!isDirectionRTL && isAlignmentLeft)) ? frozenColumns : frozenColumns.reverse();
+
+		const isRTL = direction == Direction.RTL;
+		const isLeftAligned = frozenColumnsAlignment == Alignment.LEFT || !frozenColumnsAlignment;
+		const shouldReverse = !((isLeftAligned && !isRTL) || (!isLeftAligned && isRTL));
+		frozenColumns = shouldReverse ? frozenColumns.reverse() : frozenColumns;
 
 		frozenColumns.forEach(elem => {
 			const { attributes, offsetWidth } = elem as HTMLDivElement;
 			const id = attributes.getNamedItem('data-column-id')?.value;
 
-			setSkipUpdate(true);
-			setColumnOffset({
-				direction: isAlignmentLeft ? 'left' : 'right',
+
+			const currentOffset = tableColumns[findColumnIndexById(tableColumns, id)].$offset
+			const offset: ColumnOffset = {
+				direction: isLeftAligned ? 'left' : 'right',
 				value: totalWidth
-			}, id);
+			}
+
+			if (JSON.stringify(currentOffset) !== JSON.stringify(offset)) {
+				setSkipUpdate(true);
+				setColumnOffset(offset, id);
+			}
 
 			totalWidth += offsetWidth;
 		})
-	}, [tableColumns, currentPage, sortDirection, selectedColumn, progressPending ]);
+	}
+
+	React.useEffect(() => {
+		calculateOffsets();
+	}, [tableColumns, currentPage, rowsPerPage, selectedColumn, sortDirection]);
 
 	return (
 		<ThemeProvider theme={currentTheme}>

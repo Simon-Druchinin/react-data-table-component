@@ -196,10 +196,10 @@ export function alignFrozenColumns<T>(
 export function isColumnFrozen<T>(column: TableColumn<T>, windowWidth: number): boolean {
 	return column.freeze !== undefined && (
 		column.freeze === true ||
-		(column.freeze === 'sm' && windowWidth > SMALL) ||
-		(column.freeze === 'md' && windowWidth > MEDIUM) ||
-		(column.freeze === 'lg' && windowWidth > LARGE) ||
-		(Number.isInteger(column.freeze) && windowWidth > (column.freeze as number))
+		(column.freeze === 'sm' && windowWidth >= SMALL) ||
+		(column.freeze === 'md' && windowWidth >= MEDIUM) ||
+		(column.freeze === 'lg' && windowWidth >= LARGE) ||
+		(Number.isInteger(column.freeze) && windowWidth >= (column.freeze as number))
 	)
 }
 

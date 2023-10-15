@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { decorateColumns, findColumnIndexById, getSortDirection } from '../DataTable/util';
+import { alignFrozenColumns, decorateColumns, findColumnIndexById, getSortDirection } from '../DataTable/util';
 import useDidUpdateEffect from '../hooks/useDidUpdateEffect';
 import { ColumnOffset, SortOrder, TableColumn, TableColumnExtended } from '../DataTable/types';
 import { Alignment, Direction } from '../DataTable/constants';
@@ -27,15 +27,32 @@ function useColumns<T>(
 	windowWidth: number = 0
 ): ColumnsHook<T> {
 
-	const [tableColumns, setTableColumns] = React.useState<TableColumnExtended<T>[]>(() =>
-		decorateColumns(columns, tableDirection == Direction.RTL, windowWidth, frozenColumnsAlignment),
+	// Frozen columns alignment parameters
+	const isRTL = tableDirection == Direction.RTL;
+	const isLeftAligned = frozenColumnsAlignment == Alignment.LEFT || !frozenColumnsAlignment;
+	const shouldLeftAlign = (isLeftAligned && !isRTL) || (!isLeftAligned && isRTL);
+
+	const [tableColumns, setTableColumns] = React.useState<TableColumnExtended<T>[]>(
+		alignFrozenColumns(decorateColumns(columns, windowWidth), shouldLeftAlign)
 	);
 	const [draggingColumnId, setDraggingColumn] = React.useState('');
 	const sourceColumnId = React.useRef('');
 
+
+
 	useDidUpdateEffect(() => {
-		setTableColumns(decorateColumns(columns, tableDirection == Direction.RTL, windowWidth, frozenColumnsAlignment));
-	}, [columns, tableDirection, frozenColumnsAlignment]);
+		const offsets: {
+			[id: string]: ColumnOffset
+		} = Object.assign({},
+			...tableColumns.map(col => {
+				return { [col.id?.toString() || '']: col.$offset }
+			})
+		);
+
+		setTableColumns(
+			alignFrozenColumns(decorateColumns(columns, windowWidth, offsets), shouldLeftAlign)
+		);
+	}, [columns, windowWidth, shouldLeftAlign]);
 
 	const handleDragStart = React.useCallback(
 		(e: React.DragEvent<HTMLDivElement>) => {

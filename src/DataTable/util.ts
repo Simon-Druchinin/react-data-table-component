@@ -1,7 +1,6 @@
 import { CSSObject } from 'styled-components';
-import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, TableColumnExtended } from './types';
+import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, TableColumnExtended, ColumnOffset } from './types';
 import { LARGE, MEDIUM, SMALL } from './media';
-import { Alignment } from './constants';
 
 export function prop<T, K extends keyof T>(obj: T, key: K): T[K] {
 	return obj[key];
@@ -143,29 +142,33 @@ export function removeItem<T>(array: T[] = [], item: T, keyField = 'id'): T[] {
 // Make sure columns have unique id's
 export function decorateColumns<T>(
 	columns: TableColumn<T>[],
-	isRTL: boolean,
 	windowWidth: number,
-	frozenColumnsAlignment: Alignment.LEFT | Alignment.RIGHT | undefined,
+	columnOffsets?: {
+		[id: string]: ColumnOffset
+	}
 ): TableColumnExtended<T>[] {
-	return (
-		frozenColumnsAlignment ?
-			alignFrozenColumns(columns, windowWidth, frozenColumnsAlignment, isRTL) :
-			columns
-	).map((column, index) => {
+
+	return columns.map((column, index): TableColumnExtended<T> => {
 		const decoratedColumn: TableColumnExtended<T> = {
 			...column,
 			$isFrozen: isColumnFrozen(column, windowWidth),
 			$offset: {
-				direction: frozenColumnsAlignment || 'left',
-				value: 0
-			},
+					direction: 'left',
+					value: 0
+				},
 			sortable: column.sortable || !!column.sortFunction || undefined,
 		};
 
 		if (!column.id) {
 			decoratedColumn.id = index + 1;
+		}
 
-			return decoratedColumn;
+		// If column has a set offset keep it
+		const idString = decoratedColumn.id?.toString() || '';
+		const mightHaveOffset = (columnOffsets != undefined && idString != undefined);
+
+		if (mightHaveOffset) {
+			decoratedColumn.$offset = columnOffsets[idString] || decoratedColumn.$offset;
 		}
 
 		return decoratedColumn;
@@ -173,26 +176,21 @@ export function decorateColumns<T>(
 }
 
 export function alignFrozenColumns<T>(
-	columns: TableColumn<T>[],
-	windowWidth: number,
-	alignment: Alignment.LEFT | Alignment.RIGHT,
-	isRTL: boolean
-): TableColumn<T>[] {
-	const frozenColumns: TableColumn<T>[] = []
-	const normalColumns: TableColumn<T>[] = []
+	columns: TableColumnExtended<T>[],
+	shouldLeftAlign: boolean,
+): TableColumnExtended<T>[] {
+	const frozenColumns: TableColumnExtended<T>[] = [];
+	const normalColumns: TableColumnExtended<T>[] = [];
 
 	columns.forEach(col => {
-		if (isColumnFrozen(col, windowWidth)) {
-			frozenColumns.push(col)
+		if (col.$isFrozen) {
+			frozenColumns.push(col);
 		} else {
-			normalColumns.push(col)
+			normalColumns.push(col);
 		}
 	})
 
-	let shouldLeftAlign = alignment === Alignment.LEFT;
-	if (isRTL) shouldLeftAlign = !shouldLeftAlign;
-
-	return shouldLeftAlign ? [...frozenColumns, ...normalColumns] : [...normalColumns, ...frozenColumns]
+	return shouldLeftAlign ? [...frozenColumns, ...normalColumns] : [...normalColumns, ...frozenColumns];
 }
 
 export function isColumnFrozen<T>(column: TableColumn<T>, windowWidth: number): boolean {

@@ -342,7 +342,6 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 
 	// Calc offsets for frozen columns
 	const [skipUpdate, setSkipUpdate] = React.useState(false)
-	const [lastFrozenColId, setLastFrozenColId] = React.useState('')
 
 	React.useEffect(() => {
 		if (skipUpdate) {
@@ -360,23 +359,15 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 			const { attributes, offsetWidth } = elem as HTMLDivElement;
 			const id = attributes.getNamedItem('data-column-id')?.value;
 
-			console.log(totalWidth)
-
-			setSkipUpdate(true)
+			setSkipUpdate(true);
 			setColumnOffset({
 				direction: isAlignmentLeft ? 'left' : 'right',
 				value: totalWidth
-			}, id)
+			}, id);
 
-			totalWidth += offsetWidth
+			totalWidth += offsetWidth;
 		})
-
-		if (frozenColumnsAlignment !== undefined) {
-			const { attributes } = frozenColumns[frozenColumns.length - 1] as HTMLDivElement;
-			const id = attributes.getNamedItem('data-column-id')?.value;
-			setLastFrozenColId(id || '');
-		}
-	}, [tableColumns]);
+	}, [tableColumns, currentPage, sortDirection, selectedColumn ]);
 
 	return (
 		<ThemeProvider theme={currentTheme}>

@@ -4,7 +4,7 @@ const fixedCSS = css`
 	position: sticky;
 	position: -webkit-sticky; /* Safari */
 	top: 0;
-	z-index: 1;
+	z-index: 2;
 `;
 
 const Head = styled.div<{
